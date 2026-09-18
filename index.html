@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KarmaFlow | Good & Bad Karma</title>
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --text-color: #ffffff;
+            --good-color: #f6d365;
+            --good-bg: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            --bad-color: #4a4e69;
+            --bad-bg: linear-gradient(135deg, #2b2d42 0%, #000000 100%);
+            --neutral-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: var(--neutral-bg);
+            color: var(--text-color);
+            transition: background 1s ease-in-out;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px; /* Mobile optimized */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Top Dashboard */
+        .dashboard {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 30px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .score-display {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            transition: color 0.5s;
+        }
+
+        .avatar {
+            font-size: 4rem;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Input Section */
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1rem;
+            resize: none;
+        }
+        
+        textarea::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, filter 0.2s;
+            color: white;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-good {
+            background: var(--good-bg);
+            color: #333;
+            box-shadow: 0 4px 15px rgba(246, 211, 101, 0.4);
+        }
+
+        .btn-bad {
+            background: var(--bad-bg);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Daily Quest */
+        .quests {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        
+        .quests h3 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .quest-item {
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* History Log */
+        .history {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 250px;
+        }
+
+        .log-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-points {
+            font-weight: bold;
+        }
+        .points-pos { color: var(--good-color); }
+        .points-neg { color: #ff6b6b; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Dashboard -->
+    <div class="dashboard">
+        <div class="avatar" id="avatar">🌱</div>
+        <h2 id="auraStatus">Neutral Aura</h2>
+        <div class="score-display" id="scoreDisplay">0</div>
+        <p>Overall Karma</p>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-section">
+        <textarea id="deedInput" placeholder="What did you do? (e.g., Helped someone, lost my temper...)"></textarea>
+        <div class="button-group">
+            <button class="btn-bad" onclick="addKarma(-5, 'Bad')">Bad Karma<br>-5</button>
+            <button class="btn-good" onclick="addKarma(5, 'Good')">Good Karma<br>+5</button>
+        </div>
+    </div>
+
+    <!-- Daily Quests -->
+    <div class="quests">
+        <h3>🌟 Today's Quests</h3>
+        <div class="quest-item">1. Give a genuine compliment. (+3)</div>
+        <div class="quest-item">2. Drink water instead of complaining. (+2)</div>
+    </div>
+
+    <!-- History Log -->
+    <div class="history" id="historyLog">
+        <h3>📜 Journey Log</h3>
+        <!-- Logs will be injected here via JS -->
+    </div>
+</div>
+
+<script>
+    // State Management
+    let karmaScore = parseInt(localStorage.getItem('karmaScore')) || 0;
+    let history = JSON.parse(localStorage.getItem('karmaHistory')) || [];
+    let lastLogin = localStorage.getItem('lastLogin') || new Date().toDateString();
+
+    // Elements
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const avatar = document.getElementById('avatar');
+    const auraStatus = document.getElementById('auraStatus');
+    const deedInput = document.getElementById('deedInput');
+    const historyLog = document.getElementById('historyLog');
+
+    // Karma Decay Logic (Neutral Drift)
+    function checkDecay() {
+        const today = new Date().toDateString();
+        if (lastLogin !== today) {
+            // Pull score 10% towards zero every new day
+            if (karmaScore > 0) karmaScore = Math.floor(karmaScore * 0.9);
+            if (karmaScore < 0) karmaScore = Math.ceil(karmaScore * 0.9);
+            
+            localStorage.setItem('lastLogin', today);
+            saveData();
+        }
+    }
+
+    // Add Karma Function
+    function addKarma(points, type) {
+        const text = deedInput.value.trim() || `Did a ${type.toLowerCase()} deed.`;
+        
+        // Update Score
+        karmaScore += points;
+        
+        // Add to history (add to beginning of array)
+        history.unshift({
+            deed: text,
+            points: points,
+            date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+        });
+
+        // Keep history at max 20 items to save local storage space
+        if(history.length > 20) history.pop();
+
+        // Clear input
+        deedInput.value = '';
+
+        // Save & Render
+        saveData();
+        updateUI();
+        
+        // Haptic Feedback for mobile (if supported)
+        if (navigator.vibrate) {
+            points > 0 ? navigator.vibrate([100, 50, 100]) : navigator.vibrate(200);
+        }
+    }
+
+    // Update Visuals based on score
+    function updateUI() {
+        scoreDisplay.innerText = karmaScore;
+
+        // Visual Aura Engine
+        if (karmaScore >= 50) {
+            document.body.style.background = 'var(--good-bg)';
+            avatar.innerText = '🌟';
+            auraStatus.innerText = 'Radiant Aura';
+            scoreDisplay.style.color = '#fff';
+        } else if (karmaScore > 0 && karmaScore < 50) {
+            document.body.style.background = 'var(--neutral-bg)';
+            avatar.innerText = '✨';
+            auraStatus.innerText = 'Positive Aura';
+            scoreDisplay.style.color = 'var(--good-color)';
+        } else if (karmaScore <= -50) {
+            document.body.style.background = 'var(--bad-bg)';
+            avatar.innerText = '🌩️';
+            auraStatus.innerText = 'Stormy Aura';
+            scoreDisplay.style.color = '#ff6b6b';
+        } else if (karmaScore < 0 && karmaScore > -50) {
+            document.body.style.background = '#222';
+            avatar.innerText = '☁️';
+            auraStatus.innerText = 'Clouded Aura';
+            scoreDisplay.style.color = '#ff6b6b';
+        } else {
+            document.body.style.background = 'var(--neutral-bg)';
+            avatar.innerText = '🌱';
+            auraStatus.innerText = 'Neutral Aura';
+            scoreDisplay.style.color = 'white';
+        }
+
+        renderHistory();
+    }
+
+    // Render the history list
+    function renderHistory() {
+        // Keep the title, remove old entries
+        historyLog.innerHTML = '<h3>📜 Journey Log</h3>';
+        
+        history.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'log-item';
+            
+            const pointsClass = item.points > 0 ? 'points-pos' : 'points-neg';
+            const pointsSign = item.points > 0 ? '+' : '';
+
+            div.innerHTML = `
+                <div style="flex:1; padding-right: 10px;">
+                    <span style="opacity:0.5; font-size:0.8rem;">${item.date}</span><br>
+                    ${item.deed}
+                </div>
+                <div class="log-points ${pointsClass}">${pointsSign}${item.points}</div>
+            `;
+            historyLog.appendChild(div);
+        });
+    }
+
+    // Save state to browser
+    function saveData() {
+        localStorage.setItem('karmaScore', karmaScore);
+        localStorage.setItem('karmaHistory', JSON.stringify(history));
+    }
+
+    // Initialize App
+    checkDecay();
+    updateUI();
+
+</script>
+</body>
+</html>
